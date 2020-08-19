@@ -34,14 +34,18 @@ class Resource {
     let imgUrl = await this.upload(file, 3 * 1024 * 1024)
     if(imgUrl != null){
       ctx.body = {
-        success: 1, 
-        message: "上传成功",
+        meta :{
+          status: 1,
+          msg: "上传博客图片成功",
+        },
         url: imgUrl  
       }
     } else {
       ctx.body = {
-        success: 0,
-        message: "上传失败，没有传图片，或图片大于3M。"
+        meta: {
+          status: 0,
+          msg: "上传失败，没有传图片，或图片大于3M。"
+        }
       }
     }
   }
@@ -71,14 +75,18 @@ class Resource {
     let imgUrl = await this.upload(file, 1 * 1024 * 1024)
     if(imgUrl != null){
       ctx.body = {
-        success: 1, 
-        message: "上传头像成功",
+        meta :{
+          status: 1,
+          msg: "上传头像成功",
+        },
         url: imgUrl  
       }
     } else {
       ctx.body = {
-        success: 0,
-        message: "上传失败，没有传图片，或图片大于1M。"
+        meta: {
+          status: 0,
+          msg: "上传失败，没有传图片，或图片大于1M。"
+        }
       }
     }
   }
