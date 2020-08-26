@@ -1,6 +1,8 @@
 const path = require('path')
 const fs = require('fs')
 
+const GetRadomName = require('./randomName')
+
 /**
  * @description 批量判断文件夹是否存在 如果不存在则创建文件夹
  */
@@ -32,42 +34,38 @@ function getUploadFileExt(name) {
   let ext = name.split('.')
   return ext[ext.length - 1]
 }
-
-/**
- * @description 根据区间生成随机数
- */
-function GetRandomNum(min,max){
-  let range = max - min   // 得到随机数区间
-  let rand = Math.random() // 得到随机值
-  return (min + Math.round(rand * range)) // 最小值+随机数取整
-}
-
-/** 
- * @description 输入一个区间,获取一个区间中长度的随机文件名
- */
-function GetRadomName(min,max){
-  let tempStringArray= "123456789qwertyuiopasdfghjklzxcvbnm".split("") // 构造生成时的字母库数组
-  let outPuttext = ""
-  // 随机生成文件名的长度，进行循环
-  let length = GetRandomNum(min,max)
-  for(let i = 1; i < length; i++){
-    // 随机抽取字母，拼装成需要的用户名
-    outPuttext = outPuttext + tempStringArray[GetRandomNum(0,tempStringArray.length)]
-  }
-  return outPuttext
-}
-
 /** 
  * @description 输入文件后缀,获取随机文件名
  */
 function getUploadFileName(ext) {
-  let fileName = `${GetRadomName(7,16)}.${ext}`
+  let fileName = `${GetRadomName(7,16,"NumAndLetter")}.${ext}`
   return fileName
+}
+
+//删除目录下的所有文件
+function delFile(fileUrl){
+  if (!fs.existsSync(fileUrl)) return
+  // 当前文件为文件夹时
+  if (fs.statSync(fileUrl).isDirectory()) {
+    // 读取下面的文件
+    let files = fs.readdirSync(fileUrl)
+    let len = files.length
+    // 把下面的文件删了
+    for(let i = 0; i < len; i++){
+      let url = fileUrl + '/' + files[i]
+      delFile(url)
+    }
+    // 递归出来后把自己删了
+    fs.rmdirSync(fileUrl)
+  } else { // 当前文件为文件时
+    fs.unlinkSync(fileUrl)
+  }
 }
 
 module.exports = {
   checkDirExistAndCreate,
   getUploadDirName,
   getUploadFileExt,
-  getUploadFileName
+  getUploadFileName,
+  delFile
 }

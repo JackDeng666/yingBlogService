@@ -46,7 +46,6 @@ class TokenUtil {
       }
     }
     let decoded = await this.decodeToken(authorization)
-    console.log(decoded)
     let {userId} = ctx.request.body
     // 当前登陆用户的id和请求过来操作的用户id不一致
     if(userId != null && decoded.userInfo.id != userId ){

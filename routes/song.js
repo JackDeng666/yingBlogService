@@ -21,5 +21,6 @@ router.post('/deleteSongList', TokenUtil.checkAdminToken, Song.deleteSongList)
 router.post('/updateSongList', TokenUtil.checkAdminToken, Song.updateSongList)
 
 router.get('/getSongList', Song.getSongList)
+router.get('/getLocalSongByListId', Song.getLocalSongByListId)
 
 module.exports = router

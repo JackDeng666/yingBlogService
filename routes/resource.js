@@ -15,9 +15,12 @@ router.all('*', async (ctx, next) => {
   }
 })
 
+router.get('/music/:listId/:fileName', Resource.getMusic)
 // 需要管理员权限
 router.post('/uploadBlogImg', TokenUtil.checkAdminToken,Resource.uploadBlogImg)
 router.post('/deleteBlogImg', TokenUtil.checkAdminToken, Resource.deleteBlogImg)
+router.post('/uploadMusic', TokenUtil.checkAdminToken, Resource.uploadMusic)
+router.post('/deleteMusic', TokenUtil.checkAdminToken, Resource.deleteMusic)
 // 需要用户登陆权限
 router.post('/uploadUserAvatar', TokenUtil.checkUserToken, Resource.uploadUserAvatar)
 

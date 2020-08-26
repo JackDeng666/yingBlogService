@@ -7,23 +7,36 @@ const {RESOURCE_URL} = require('../config')
 class Resource {
   constructor(){
   }
-  async upload(file, fileSizeLimit){
+  async upload(file, fileSizeLimit, listId){
     // 检查文件存在与大小
     if (file != null && file.size < fileSizeLimit) {
-      // 以当前日期生成路径文件夹，检查文件夹是否存在如果不存在则新建文件夹
-      let dir = UploadUtil.getUploadDirName()
-      let pathName = path.join(__dirname, `../static/resource/img/${dir}`)
-      UploadUtil.checkDirExistAndCreate(pathName)
-      // 通过文件后缀，获取随机的文件名
-      let fileName = UploadUtil.getUploadFileName(UploadUtil.getUploadFileExt(file.name))
-      // 创建可读流
-      const reader = fs.createReadStream(file.path)
-      let filePath = `${pathName}/${fileName}`
-      // 创建可写流
-      const upStream = fs.createWriteStream(filePath)
-      // 可读流通过管道写入可写流
-      await reader.pipe(upStream)
-      return `${RESOURCE_URL}img/${dir}/${fileName}` // 返回图片网络地址
+      let ext = UploadUtil.getUploadFileExt(file.name)
+      if(ext == "mp3" || ext == "m4a"){
+        let pathName = path.join(__dirname, `../static/resource/music/${listId}`)
+        UploadUtil.checkDirExistAndCreate(pathName)
+        // 创建可读流
+        let reader = fs.createReadStream(file.path)
+        let filePath = `${pathName}/${file.name}`
+        // 创建可写流
+        let upStream = fs.createWriteStream(filePath)
+        // 可读流通过管道写入可写流
+        await reader.pipe(upStream)
+      } else if(ext == "jpg" || ext == "jpeg" || ext == "gif" || ext == "png") {
+        // 以当前日期生成路径文件夹，检查文件夹是否存在如果不存在则新建文件夹
+        let dir = UploadUtil.getUploadDirName()
+        let pathName = path.join(__dirname, `../static/resource/img/${dir}`)
+        UploadUtil.checkDirExistAndCreate(pathName)
+        // 通过文件后缀，获取随机的文件名
+        let fileName = UploadUtil.getUploadFileName(ext)
+        // 创建可读流
+        let reader = fs.createReadStream(file.path)
+        let filePath = `${pathName}/${fileName}`
+        // 创建可写流
+        let upStream = fs.createWriteStream(filePath)
+        // 可读流通过管道写入可写流
+        await reader.pipe(upStream)
+        return `${RESOURCE_URL}img/${dir}/${fileName}` // 返回图片网络地址
+      }
     } else {
       return null
     }
@@ -50,7 +63,7 @@ class Resource {
     }
   }
   async deleteBlogImg(ctx) {
-    let blogImgUrl = ctx.request.body.blogImgUrl
+    let {blogImgUrl} = ctx.request.body
     if(blogImgUrl){
       let ext = blogImgUrl.split('img/')
       fs.unlinkSync(path.join(__dirname, `../static/resource/img/${ext[ext.length - 1]}`), (err) => { })
@@ -89,6 +102,58 @@ class Resource {
         }
       }
     }
+  }
+  uploadMusic = async ctx => {
+    let musicFile = ctx.request.files.musicFile
+    let {listId} = ctx.request.body
+    // 传了多个文件
+    if(musicFile.length){
+      musicFile.forEach(async file => {
+        await this.upload(file, 10 * 1024 * 1024, listId)
+      })
+    } else { // 传了一个
+      await this.upload(musicFile, 10 * 1024 * 1024, listId)
+    }    
+    ctx.body = {
+      meta :{
+        status: 1,
+        msg: "上传音乐成功",
+      }
+    }
+  }
+  deleteMusic(ctx){
+    let {musicUrl} = ctx.request.body
+    if(musicUrl){
+      let ext = musicUrl.split('music/')
+      fs.unlinkSync(path.join(__dirname, `../static/resource/music/${ext[ext.length - 1]}`), (err) => { })
+      ctx.body = {
+        meta: { status: 1, msg: '删除音乐成功' }
+      }
+    } else {
+      ctx.body = {
+        meta: { status: 0, msg: '没传音乐地址' }
+      }
+    }
+  }
+  getMusic(ctx){
+    let {listId, fileName} = ctx.params
+    let file = path.resolve(__dirname, `../static/resource/music/${listId}/${fileName}`)
+
+    let stats = fs.statSync(file)
+    let range = ctx.headers.range
+    let positions = range.replace(/bytes=/, "").split("-")
+    let start = parseInt(positions[0], 10)
+    let total = stats.size
+    let end = positions[1] ? parseInt(positions[1], 10) : total - 1
+    let chunksize = (end - start) + 1
+
+    ctx.status = 206
+    ctx.append("Content-Range", "bytes " + start + "-" + end + "/" + total)
+    ctx.append("Accept-Ranges", "bytes")
+    ctx.append("Content-Length", chunksize)
+    ctx.append("Content-Type", "video/m4a")
+
+    ctx.body =  fs.createReadStream(file, {start: start, end: end})
   }
 }
 
