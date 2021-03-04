@@ -45,13 +45,13 @@ class User {
           <p style="font-size: 18px;color:#000;">
             您的验证码为：
             <span style="font-size: 16px;color:#f00;"> ${ emailCode }， </span>
-            您当前正在前端舰长JD的个人博客学习网站注册账号。
+            您当前正在嘤之博客网站注册账号。
           </p>
           <p style="font-size: 1.5rem;color:#999;">3分钟内有效</p>
         `
       }
       let emailCotent = {
-        from: '3216066442@qq.com', // 发件人地址
+        from: 'jackdeng155@qq.com', // 发件人地址
         to: toEmail, // 收件人地址，多个收件人可以使用逗号分隔
         subject: email.title,  // 邮件标题
         html: email.body  // 邮件内容

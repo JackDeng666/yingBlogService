@@ -135,26 +135,33 @@ class Resource {
       }
     }
   }
-  getMusic(ctx){
-    let {listId, fileName} = ctx.params
-    let file = path.resolve(__dirname, `../static/resource/music/${listId}/${fileName}`)
+  // getMusic(ctx, next){
+  //   let {listId, fileName} = ctx.params
+  //   let file = path.resolve(__dirname, `../static/resource/music/${listId}/${fileName}`)
+    
+  //   let stats = fs.statSync(file)
+  //   let range = ctx.headers.range
+  //   let total = stats.size
 
-    let stats = fs.statSync(file)
-    let range = ctx.headers.range
-    let positions = range.replace(/bytes=/, "").split("-")
-    let start = parseInt(positions[0], 10)
-    let total = stats.size
-    let end = positions[1] ? parseInt(positions[1], 10) : total - 1
-    let chunksize = (end - start) + 1
+  //   ctx.append("Accept-Ranges", "bytes")
+  //   ctx.append("Content-Type", "audio/mp4")
+  //   ctx.append("Cache-Control", `max-age=${7 * 86400}`)
 
-    ctx.status = 206
-    ctx.append("Content-Range", "bytes " + start + "-" + end + "/" + total)
-    ctx.append("Accept-Ranges", "bytes")
-    ctx.append("Content-Length", chunksize)
-    ctx.append("Content-Type", "video/m4a")
+  //   if(!range){     
+  //     return next()
+  //   } else {
+  //     let positions = range.replace(/bytes=/, "").split("-")
+  //     let start = parseInt(positions[0], 10)
+  //     let end = positions[1] ? parseInt(positions[1], 10) : total - 1
+  //     let chunksize = (end - start) + 1
+      
+  //     ctx.status = 206
+  //     ctx.append("Content-Range", "bytes " + start + "-" + end + "/" + total)
+  //     ctx.append("Content-Length", chunksize)
 
-    ctx.body =  fs.createReadStream(file, {start: start, end: end})
-  }
+  //     ctx.body =  fs.createReadStream(file, {start: start, end: end})
+  //   }
+  // }
 }
 
 module.exports = new Resource()

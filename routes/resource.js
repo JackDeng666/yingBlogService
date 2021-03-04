@@ -15,7 +15,7 @@ router.all('*', async (ctx, next) => {
   }
 })
 
-router.get('/music/:listId/:fileName', Resource.getMusic)
+// router.get('/music/:listId/:fileName', Resource.getMusic)
 // 需要管理员权限
 router.post('/uploadBlogImg', TokenUtil.checkAdminToken,Resource.uploadBlogImg)
 router.post('/deleteBlogImg', TokenUtil.checkAdminToken, Resource.deleteBlogImg)

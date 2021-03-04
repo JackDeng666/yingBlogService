@@ -48,17 +48,17 @@ app.use(cors())
 app.use(koaBody({
   multipart: true
 }))
+app.use(router.routes())
 //处理静态资源，maxage为缓存时间，单位为毫秒
 app.use(static(path.resolve('./static'),{ maxage: 7 * 86400 * 1000 }))
-app.use(router.routes())
 // 捕获读音视频流错误
-app.on('error', (error) => {
-  if (error.code === 'EPIPE') {
-    console.log('Koa app-level EPIPE error：' + error )
-  } else {
-    console.log('Koa app-level error：' + error)
-  }
-})
+// app.on('error', (error) => {
+//   if (error.code === 'EPIPE') {
+//     console.log('Koa app-level EPIPE error：' + error )
+//   } else {
+//     console.log('Koa app-level error：' + error)
+//   }
+// })
 
 // 直接启动
 // app.listen(80,() => {
